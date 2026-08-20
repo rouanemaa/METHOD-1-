@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Bibliothèque{% endblock %}
+{% block content %}
+
+<h2 class="page-title">Bibliothèque</h2>
+<p class="page-sub">Tout le contenu METHOD 1%, organisé et à ton image.</p>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('modules', this)">Modules</button>
+  <button class="tab-btn" onclick="showTab('ebooks', this)">Ebooks</button>
+  <button class="tab-btn" onclick="showTab('themes', this)">Thèmes Shopify</button>
+  <button class="tab-btn" onclick="showTab('bonus', this)">Bonus</button>
+</div>
+
+<div class="tab-panel active" id="tab-modules">
+  <div class="lib-grid">
+    {% for phase in roadmap.phases %}
+    <a class="lib-card" href="{{ url_for('roadmap_view') }}" style="color:inherit;">
+      <div class="lib-thumb">
+        <span class="ribbon">{{ 'BONUS' if phase.is_bonus else 'MODULE ' ~ phase.position }}</span>
+        {% if phase.status == 'locked' %}
+        <svg class="icon" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9" rx="1.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>
+        {% else %}
+        <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7Z"/></svg>
+        {% endif %}
+      </div>
+      <div class="lib-body">
+        <div class="cat">{{ phase.weighted_total }} {{ 'leçons' if not phase.is_bonus else 'éléments' }}</div>
+        <div class="title">{{ phase.title }}</div>
+        <div class="desc">{{ phase.description }}</div>
+        <div class="lib-foot">
+          {% if phase.status == 'done' %}
+            <span class="badge b-done"><svg class="icon" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Terminé</span>
+          {% elif phase.status == 'current' %}
+            <span class="badge b-current"><svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7Z"/></svg>{{ phase.pct }}%</span>
+          {% else %}
+            <span class="badge b-locked"><svg class="icon" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9" rx="1.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Verrouillé</span>
+          {% endif %}
+          {% if phase.hours_estimate %}<span class="meta"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/></svg>~{{ phase.hours_estimate }}h</span>{% endif %}
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-ebooks">
+  <div class="res-list">
+    {% for r in ebooks %}
+    <a class="res-row" href="{{ r.primary_url or url_for('resource_detail', resource_id=r.id) }}" {{ 'target=_blank rel=noopener' if r.primary_url else '' }}>
+      <div class="res-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z"/></svg></div>
+      <div class="res-info"><div class="r-title">{{ r.title }}</div><div class="r-cat">{{ r.subtitle }}{{ ' · ' ~ r.files|length ~ ' fichiers' if r.files|length > 1 else '' }}</div></div>
+      <span class="res-tag">{{ r.tag }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-themes">
+  <div class="res-list">
+    {% for r in themes %}
+    <a class="res-row" href="{{ r.primary_url or url_for('resource_detail', resource_id=r.id) }}" {{ 'target=_blank rel=noopener' if r.primary_url else '' }}>
+      <div class="res-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg></div>
+      <div class="res-info"><div class="r-title">{{ r.title }}</div><div class="r-cat">{{ r.subtitle }}</div></div>
+      <span class="res-tag">{{ r.tag }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-bonus">
+  <div class="res-list">
+    {% for r in bonus %}
+    <a class="res-row" href="{{ r.primary_url or url_for('resource_detail', resource_id=r.id) }}" {{ 'target=_blank rel=noopener' if r.primary_url else '' }}>
+      <div class="res-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2 9 8H3l5 4-2 8 6-4 6 4-2-8 5-4h-6Z"/></svg></div>
+      <div class="res-info"><div class="r-title">{{ r.title }}</div><div class="r-cat">{{ r.subtitle }}</div></div>
+      <span class="res-tag">{{ r.tag }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function showTab(name, btn){
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+
+{% endblock %}

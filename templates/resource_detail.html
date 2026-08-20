@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ resource['title'] }}{% endblock %}
+{% block content %}
+
+<a class="back-link" href="{{ url_for('library') }}">← Retour à la bibliothèque</a>
+
+<h2 class="page-title">{{ resource['title'] }}</h2>
+<p class="page-sub">{{ resource['subtitle'] }} · {{ files|length }} fichier{{ 's' if files|length != 1 else '' }}</p>
+
+<div class="panel">
+  {% for f in files %}
+  <a class="other-file-row" href="{{ f.view_url }}" target="_blank" rel="noopener">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z"/></svg>
+    <span>{{ f.name }}</span>
+    <svg class="icon" viewBox="0 0 24 24" style="color:var(--text-muted);"><path d="m9 18 6-6-6-6"/></svg>
+  </a>
+  {% endfor %}
+</div>
+
+{% endblock %}

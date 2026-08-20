@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Élèves{% endblock %}
+{% block content %}
+
+<h2 class="page-title">Élèves</h2>
+<p class="page-sub">Crée des accès et suis la progression de chaque élève dans le programme METHOD 1%.</p>
+
+{% if new_password %}
+<div class="credential-banner">
+  <div>
+    <div class="cb-title">Compte créé pour {{ new_student_email }}</div>
+    <div class="cb-detail">Mot de passe généré : {{ new_password }} — transmets-le à l'élève, il ne sera plus affiché après cette page.</div>
+  </div>
+</div>
+{% endif %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <div class="flash-error" style="max-width:none;">{{ messages[0] }}</div>
+  {% endif %}
+{% endwith %}
+
+<div class="admin-toolbar">
+  <div style="font-size:13px; color:var(--text-muted);">{{ rows|length }} élève{{ 's' if rows|length != 1 else '' }}</div>
+  <form class="add-student-form" method="post" action="{{ url_for('admin_new_student') }}">
+    <input type="text" name="name" placeholder="Nom de l'élève" required>
+    <input type="email" name="email" placeholder="email@élève.com" required>
+    <button class="btn-accent-sm" type="submit">+ Ajouter un élève</button>
+  </form>
+</div>
+
+<table class="student-table">
+  <thead>
+    <tr>
+      <th>Élève</th>
+      <th>Étape actuelle</th>
+      <th>Progression</th>
+      <th>Étapes terminées</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr class="clickable" onclick="window.location='{{ url_for('admin_student_detail', student_id=row.user['id']) }}'">
+      <td>
+        <div class="s-name">{{ row.user['name'] }}</div>
+        <div class="s-email">{{ row.user['email'] }}</div>
+      </td>
+      <td>
+        {% if row.roadmap.current_phase %}
+          {{ row.roadmap.current_phase.title }}
+        {% else %}
+          Programme terminé 🎉
+        {% endif %}
+      </td>
+      <td>
+        <div class="mini-progress">
+          <div class="progress-track"><div class="progress-fill" style="width:{{ row.roadmap.global_pct }}%;"></div></div>
+          <span class="pct-label">{{ row.roadmap.global_pct }}%</span>
+        </div>
+      </td>
+      <td>{{ row.roadmap.phases_done }} / {{ row.roadmap.phases_total }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" style="color:var(--text-muted);">Aucun élève pour l'instant — ajoute-en un ci-dessus.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

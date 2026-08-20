@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson['title'] }}{% endblock %}
+{% block content %}
+
+<a class="back-link" href="{{ url_for('roadmap_view') }}">← Retour à la feuille de route</a>
+
+<div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:4px;">
+  <h2 class="page-title" style="margin-bottom:0;">{{ lesson['title'] }}</h2>
+  <form method="post" action="{{ url_for('toggle_lesson', lesson_id=lesson['id']) }}">
+    <button type="submit" class="btn-small" style="{{ '' if not completed else 'background:var(--good); color:#08260a;' }}">
+      {% if completed %}✓ Terminé{% else %}Marquer comme terminé{% endif %}
+    </button>
+  </form>
+</div>
+<p class="page-sub">{{ phase['title'] }} · {{ video_files|length + other_files|length }} fichier{{ 's' if (video_files|length + other_files|length) != 1 else '' }}</p>
+
+{% if video_files %}
+  {% for v in video_files %}
+  <div class="video-embed">
+    <span class="v-label">{{ v.name }}</span>
+    <iframe src="{{ v.preview_url }}" allow="autoplay" allowfullscreen loading="lazy"></iframe>
+  </div>
+  {% endfor %}
+{% endif %}
+
+{% if other_files %}
+<div class="panel">
+  <h3>Fichiers</h3>
+  {% for f in other_files %}
+  <a class="other-file-row" href="{{ f.view_url }}" target="_blank" rel="noopener">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z"/></svg>
+    <span>{{ f.name }}</span>
+    <svg class="icon" viewBox="0 0 24 24" style="color:var(--text-muted);"><path d="m9 18 6-6-6-6"/></svg>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if not video_files and not other_files %}
+<div class="panel" style="color:var(--text-muted); text-align:center; padding:40px;">Aucun fichier relié pour l'instant.</div>
+{% endif %}
+
+{% endblock %}
